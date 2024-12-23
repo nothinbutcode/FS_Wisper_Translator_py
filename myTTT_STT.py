@@ -1,4 +1,3 @@
-#import numpy as np
 import sounddevice as sd
 import time as t
 #import matplotlib.pyplot as plt
@@ -118,26 +117,61 @@ class Audio:
         if listview == 'print':
             print(f"Default output device index: {sd.default.device[1]}")
         return int(sd.default.device[1])
+#------------------------------------------------------------------------------------------
+#-----------------------------------LIVE MIC-----------------------------------------------
+#------------------------------------------------------------------------------------------
+    def live_mic(self, channels=2, samplerate=None, blocksize=None, latency=None, dtype=None):
+        def callback(indata, outdata, frames, time, status):
+            if status:
+                print(status)
+            outdata[:] = indata
 
+        try:
+            with sd.Stream(
+                device=(self.input_device_num, self.output_device_num),
+                samplerate=samplerate,
+                blocksize=blocksize,
+                dtype=dtype,
+                latency=latency,
+                channels=channels,
+                callback=callback,
+            ):
+                print("#" * 80)
+                print("Press Enter to quit")
+                print("#" * 80)
+                input()
+        except Exception as e:
+            print(f"Error: {type(e).__name__}: {e}")
+#------------------------------------------------------------------------------------------
+#-----------------------------------Play Audio File-----------------------------------------------
+#------------------------------------------------------------------------------------------
+    # Play an audio file
+    def play_audio_file(self, audio_file=None):
+        if not audio_file and not self.audio_file:
+            raise ValueError("No audio file provided.")
+        file_to_play = audio_file or self.audio_file
+
+        try:
+            data, samplerate = sf.read(file_to_play)
+            print(f"Playing audio file: {file_to_play}")
+            sd.play(data, samplerate=samplerate, device=self.output_device_num)
+            sd.wait()  # Wait until the playback is finished
+        except Exception as e:
+            print(f"Error playing audio file: {type(e).__name__}: {e}")
 
 if __name__ == '__main__':
-    # Initialize audio objects
-    audio1 = Audio()
-    audio2 = Audio(input_device_num=1, output_device_num=6)
+  # Initialize Audio
+  #3 is the input device from headset mic and 10 is the output device to asus
+    audio = Audio(False,3, 10,False)
 
-    # Test getting the default input and output devices
-    default_input_device1 = audio1.get_default_input_device()
-    default_output_device1 = audio1.get_default_output_device()
+    try:
+        file_path = "example_audio.wav"  # Replace with your audio file path
+        audio.play_audio_file(file_path)
+    except ValueError as e:
+        print(e)
 
-    default_input_device2 = audio2.get_default_input_device()
-    default_output_device2 = audio2.get_default_output_device()
-
-    # Test setting the default input and output devices
-    set_input_device1 = audio1.set_default_input_device()
-    set_output_device1 = audio1.set_default_output_device()
-
-    set_input_device2 = audio2.set_default_input_device()
-    set_output_device2 = audio2.set_default_output_device()
-
-    print(f"Audio1 Default Input: {set_input_device1}, Default Output: {set_output_device1}")
-    print(f"Audio2 Default Input: {set_input_device2}, Default Output: {set_output_device2}")
+    # Start live mic streaming
+    print("Starting live microphone streaming...")
+    # Start live mic streaming
+    print("Starting live microphone streaming...")
+    
