@@ -1,15 +1,3 @@
-#import numpy as np
-import sounddevice as sd
-import time as t
-#import matplotlib.pyplot as plt
-
-# get sound devices
-# set sound device input and output
-# store sound chunks in an array using numpy and linspace
-# from array take chunk of a certain amount (word aware) feed it to wisper
-# take that trascribed and then translate it
-# output tranlated and transcribed (make it optional) terminal or 
-
 import sounddevice as sd
 
 class Audio:
@@ -44,6 +32,7 @@ class Audio:
             self.output_device_num = int(set_output_device_num)
         return self.get_default_output_device()
 
+    # Set input device to default
     # Set input device to default
     def set_default_input_device(self):
         default_input_device_index = sd.default.device[0]
@@ -123,14 +112,14 @@ class Audio:
 if __name__ == '__main__':
     # Initialize audio objects
     audio1 = Audio()
-    audio2 = Audio(input_device_num=1, output_device_num=6)
+    audio2 = Audio(input_device_num=6, output_device_num=2)
 
     # Test getting the default input and output devices
-    default_input_device1 = audio1.get_default_input_device()
-    default_output_device1 = audio1.get_default_output_device()
+    default_input_device1 = audio1.get_default_input_device('print')
+    default_output_device1 = audio1.get_default_output_device('print')
 
-    default_input_device2 = audio2.get_default_input_device()
-    default_output_device2 = audio2.get_default_output_device()
+    default_input_device2 = audio2.get_default_input_device('print')
+    default_output_device2 = audio2.get_default_output_device('print')
 
     # Test setting the default input and output devices
     set_input_device1 = audio1.set_default_input_device()
